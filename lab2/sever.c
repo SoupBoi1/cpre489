@@ -20,7 +20,7 @@ int main(){
     int bind_r = bind(sever_scoket,&addr,sizeof(addr) );
     printf("bind: %d\n",bind_r);
     int listen_r = listen(sever_scoket,7);
-        printf("listen: %d\n",listen_r);
+    printf("listen: %d\n",listen_r);
 
 
     struct  sockaddr_in client_addr ;
@@ -28,19 +28,19 @@ int main(){
     int newscoket = accept(sever_scoket,&client_addr,&client_addr_size);
     printf("accept: %d\n",newscoket);
     char* buffer;
-    int read_r= read(newscoket,&buffer,50 );
-        printf("read: %d\n",read_r);
-
+   // buffer = malloc(8); 
+    int read_r= read(newscoket,&buffer,8 );
+        printf("read: %d, %s\n",read_r,buffer);
+  /*  buffer = malloc(8); 
     int write_r = write(newscoket,buffer,sizeof(buffer));
-        printf("write_r: %d\n",write_r);
+        printf("write_r: %d , %s\n",write_r,buffer);
 
     int close_r = close(sever_scoket);
         printf("close_r: %d\n",close_r);
+*/
 
 
 
-
-   // printf("serverscoket open: %d \nbind:%d \nlisten: %d \nappect:%d \nread:%d \nwrite: \n%d",sever_scoket,bind_r,listen_r,newscoket,read_r,close_r);
 
     return 0;
 }

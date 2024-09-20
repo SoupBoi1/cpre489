@@ -23,11 +23,12 @@ int main(){
     int connect_r = connect(clintSocket,(struct sockaddr*)&addr,sizeof(addr));
             printf("connect_r: %d\n",connect_r);
 
-    char* buffer = "cool"; 
-    int write_r = write(clintSocket,buffer,sizeof(buffer));
-    printf("write_r: %d\n",write_r);
-    int read_r= read(clintSocket,&buffer,50 );
-    printf("read_r: %d\n",read_r);
+    char* buffer = "su"; 
+    int write_r = write(clintSocket,buffer,8);
+    printf("write_r: %d sending: %s\n",write_r,buffer);
+   // buffer = malloc(8); 
+    int read_r= read(clintSocket,&buffer,8 );
+    printf("read_r: %d, got %s\n",read_r,buffer);
     int close_r = close(clintSocket);
     printf("close_r: %d\n",close_r);
 
