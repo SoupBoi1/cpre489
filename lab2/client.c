@@ -6,31 +6,52 @@
 
 
 
-
+#define buffersize 4096
+#define SEVER_PORT 8080
 
 int main(){
 
-    
+    FILE *fp;
+    char filebuffer[128];
+    char writebuffer[buffersize]; 
+    char readbuffer[buffersize];
+
+
     int clintSocket = socket(PF_INET,SOCK_STREAM,0);
         printf("serverscoket open: %d\n",clintSocket);
 
 
     struct  sockaddr_in addr ;
     addr.sin_family =PF_INET;
-    addr.sin_port = htons(8080);
+    addr.sin_port = htons(SEVER_PORT);
     addr.sin_addr.s_addr =inet_addr("127.0.0.1");
     
+    fp = popen("uptime","r" );
+    if(fp ==NULL){
+        perror("uptime commad failed to read");
+        exit(1);
+    }
+    fgets(writebuffer,buffersize, fp);
+   
+    writebuffer[strlen(writebuffer)-1]='\0';
+    printf("%s\n",&writebuffer);
+    pclose(fp);
+
     int connect_r = connect(clintSocket,(struct sockaddr*)&addr,sizeof(addr));
             printf("connect_r: %d\n",connect_r);
 
-    char* buffer = "su"; 
-    int write_r = write(clintSocket,buffer,8);
-    printf("write_r: %d sending: %s\n",write_r,buffer);
-   // buffer = malloc(8); 
-    int read_r= read(clintSocket,&buffer,8 );
-    printf("read_r: %d, got %s\n",read_r,buffer);
+    int write_r = write(clintSocket,writebuffer,buffersize);
+
+    printf("write_r: %d sending: %s\n",write_r,writebuffer);
+
+    
+    int read_r= read(clintSocket,&readbuffer,buffersize );
+
+    printf("read_r: %d, got %s\n",read_r,readbuffer);
     int close_r = close(clintSocket);
     printf("close_r: %d\n",close_r);
+
+
 
  //   printf("%d \n%d \n%d \n%d \n%d \n",clintSocket,connect_r,write_r,read_r,close_r);
     return 0;
