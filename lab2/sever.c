@@ -9,8 +9,9 @@
 #define SEVER_PORT 8080
 
 
-int main(){
+int main(int argc, char **argv){
     FILE *fp;
+    FILE *fip;
     char filebuffer[128];
     char writebuffer[buffersize]; 
     char readbuffer[buffersize];
@@ -62,18 +63,30 @@ int main(){
         printf("read: %d\n",0);
     }
     printf("readed: %s\n",&buffer);
-
-// ----- uptime string -----
+    
+    ///------------uptime and ip wirte buffer genterated---- //
+    // ------ uptime ------------//
     fp = popen("uptime","r" );
     if(fp ==NULL){
         perror("uptime commad failed to read");
         exit(1);
     }
-    fgets(writebuffer,buffersize, fp);
-   
-    writebuffer[strlen(writebuffer)-1]='\0';
+    char writebuffer_tem[buffersize]; 
+    fgets(writebuffer_tem,buffersize, fp);   
+    writebuffer_tem[strlen(writebuffer_tem)-1]='\0';
     pclose(fp);
-
+    // ------ ip ------------//
+    fip = popen("hostname -I","r" );
+    if(fip ==NULL){
+        perror("uptime commad failed to read");
+        exit(1);
+    }
+    char writebuffer_IP[buffersize]; 
+    fscanf(fip,"%s",writebuffer_IP);
+    writebuffer_IP[strlen(writebuffer_IP)]='\0';
+    pclose(fip);
+    sprintf(writebuffer,"%s: %s", writebuffer_IP ,writebuffer_tem);
+    ///------------uptime and ip wirte buffer genterated end;---- ///
 
     if(write(newscoket,writebuffer,buffersize)<0){
         closeSever(sever_scoket);

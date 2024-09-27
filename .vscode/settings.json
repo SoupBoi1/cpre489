@@ -3,7 +3,8 @@
   "files.associations": {
     "types.h": "c",
     "socket.h": "c",
-    "in.h": "c"
+    "in.h": "c",
+    "type_traits": "c"
   },
   "C_Cpp_Runner.msvcBatchPath": "",
   "C_Cpp_Runner.cCompilerPath": "gcc",
