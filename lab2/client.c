@@ -19,7 +19,7 @@ int main(int argc, char **argv){
 
 
     int clintSocket = socket(PF_INET,SOCK_STREAM,0);
-        printf("serverscoket open: %d\n",clintSocket);
+       // printf("serverscoket open: %d\n",clintSocket);
 
 
     struct  sockaddr_in addr ;
@@ -45,8 +45,6 @@ int main(int argc, char **argv){
         exit(1);
     }
     char writebuffer_IP[buffersize]; 
-   // fgets(writebuffer_IP_tem,buffersize, fip);   
-    //writebuffer_IP = strtok(writebuffer_IP_tem, " ");
     fscanf(fip,"%s",writebuffer_IP);
     writebuffer_IP[strlen(writebuffer_IP)]='\0';
     pclose(fip);
@@ -54,22 +52,22 @@ int main(int argc, char **argv){
     ///------------uptime and ip wirte buffer genterated end;---- ///
 
     int connect_r = connect(clintSocket,(struct sockaddr*)&addr,sizeof(addr));
-    printf("connect_r: %d\n",connect_r);
+   // printf("connect_r: %d\n",connect_r);
 
     int write_r = write(clintSocket,writebuffer,buffersize);
 
-    printf("write_r: %d \nsending: %s\n",write_r,writebuffer);
+   // printf("write_r: %d \nsending: %s\n",write_r,writebuffer);
 
     
     int read_r= read(clintSocket,&readbuffer,buffersize );
-
-    printf("read_r: %d\ngot from sever: %s\n",read_r,readbuffer);
+    printf("%s\n",&readbuffer);
+   // printf("read_r: %d\ngot from sever: %s\n",read_r,readbuffer);
     int close_r = close(clintSocket);
-    printf("close_r: %d\n",close_r);
+   // printf("close_r: %d\n",close_r);
 
 
 
- //   printf("%d \n%d \n%d \n%d \n%d \n",clintSocket,connect_r,write_r,read_r,close_r);
+ //  // printf("%d \n%d \n%d \n%d \n%d \n",clintSocket,connect_r,write_r,read_r,close_r);
     return 0;
 }
 
