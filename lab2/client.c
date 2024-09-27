@@ -34,20 +34,19 @@ int main(){
     fgets(writebuffer,buffersize, fp);
    
     writebuffer[strlen(writebuffer)-1]='\0';
-    printf("%s\n",&writebuffer);
     pclose(fp);
 
     int connect_r = connect(clintSocket,(struct sockaddr*)&addr,sizeof(addr));
-            printf("connect_r: %d\n",connect_r);
+    printf("connect_r: %d\n",connect_r);
 
     int write_r = write(clintSocket,writebuffer,buffersize);
 
-    printf("write_r: %d sending: %s\n",write_r,writebuffer);
+    printf("write_r: %d \nsending: %s\n",write_r,writebuffer);
 
     
     int read_r= read(clintSocket,&readbuffer,buffersize );
 
-    printf("read_r: %d, got %s\n",read_r,readbuffer);
+    printf("read_r: %d\ngot from sever: %s\n",read_r,readbuffer);
     int close_r = close(clintSocket);
     printf("close_r: %d\n",close_r);
 

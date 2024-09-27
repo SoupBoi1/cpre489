@@ -10,6 +10,7 @@
 
 
 int main(){
+    FILE *fp;
     char filebuffer[128];
     char writebuffer[buffersize]; 
     char readbuffer[buffersize];
@@ -62,27 +63,29 @@ int main(){
     }
     printf("readed: %s\n",&buffer);
 
-    if(write(newscoket,buffer,buffersize)<0){
+// ----- uptime string -----
+    fp = popen("uptime","r" );
+    if(fp ==NULL){
+        perror("uptime commad failed to read");
+        exit(1);
+    }
+    fgets(writebuffer,buffersize, fp);
+   
+    writebuffer[strlen(writebuffer)-1]='\0';
+    pclose(fp);
+
+
+    if(write(newscoket,writebuffer,buffersize)<0){
         closeSever(sever_scoket);
         printf("write_r: %d\n",-1);
     }else{
         printf("write_r: %d\n",0);
     }
-    printf("write_r: %s\n",&buffer);
- 
- /*  // buffer = malloc(8); 
-    int read_r= read(newscoket,&buffer,8 );
-        printf("read: %d, %s\n",read_r,buffer);
-    buffer = malloc(8); 
-    int write_r = write(newscoket,buffer,sizeof(buffer));
-        printf("write_r: %d , %s\n",write_r,buffer);
-
-    
-*/
+    printf("write_r: %d sending: %s\n",buffersize,writebuffer);
 
 
 
-
+    closeSever(sever_scoket);
     return 0;
 }
 
