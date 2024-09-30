@@ -36,64 +36,64 @@ int main(int argc, char **argv){
     }else{
        // printf("bind: %d\n",0);
     }
-
+   while (1) { //sever's while loop 
  
-    if(listen(sever_scoket,7)<0){ // if listen is susseful or the sever closes   
-        closeSever(sever_scoket);
-       // printf("listen: %d\n",-1);
-    }else{
-       // printf("listen: %d\n",0);
-    }
+      if(listen(sever_scoket,7)<0){ // if listen is susseful or the sever closes   
+         closeSever(sever_scoket);
+         // printf("listen: %d\n",-1);
+      }else{
+         // printf("listen: %d\n",0);
+      }
 
-    newscoket = accept(sever_scoket,&client_addr,&client_addr_size); // checks if appect is succesfull or the sever closes 
-    if(newscoket<0){
-        closeSever(sever_scoket);
-       // printf("accept: %d\n",-1);
-    }else{
-       // printf("accept: %d\n",0);
-    }
+      newscoket = accept(sever_scoket,&client_addr,&client_addr_size); // checks if appect is succesfull or the sever closes 
+      if(newscoket<0){
+         closeSever(sever_scoket);
+         // printf("accept: %d\n",-1);
+      }else{
+         // printf("accept: %d\n",0);
+      }
 
-    if(read(newscoket,&readbuffer,buffersize )<0){ //  checks it got anything some client else the sever closes 
-        closeSever(sever_scoket);
-       // printf("read: %d\n",-1);
-    }else{
-       // printf("read: %d\n",0);
-    }
-    printf("%s\n",&readbuffer);  // prints the the uptime from client
+      if(read(newscoket,&readbuffer,buffersize )<0){ //  checks it got anything some client else the sever closes 
+         closeSever(sever_scoket);
+         // printf("read: %d\n",-1);
+      }else{
+         // printf("read: %d\n",0);
+      }
+      printf("%s\n",&readbuffer);  // prints the the uptime from client
 
-    ///------------uptime and ip wirte buffer genterated---- //
-    // ------ uptime ------------//
-    fp = popen("uptime","r" ); // run the commad
-    if(fp ==NULL){
-        perror("uptime commad failed to read");
-        exit(1);
-    }
-    char writebuffer_tem[buffersize]; 
-    fgets(writebuffer_tem,buffersize, fp);   // puts tiem uptime output to this value 
-    writebuffer_tem[strlen(writebuffer_tem)-1]='\0'; // places a null in the end incase there isn't
-    pclose(fp);
-    // ------ ip ------------//
-    fip = popen("hostname -I","r" ); // run the commad to get ipaddres of the this sever 
-    if(fip ==NULL){ 
-        perror("uptime commad failed to read");
-        exit(1);
-    }
-    char writebuffer_IP[buffersize]; // the ip address of the computer here 
-    fscanf(fip,"%s",writebuffer_IP); // gets first word of the ip addrss commad hostname -I"'s output
-    writebuffer_IP[strlen(writebuffer_IP)]='\0'; // put null in the end of the string 
-    pclose(fip);
-    sprintf(writebuffer,"%s: %s", writebuffer_IP ,writebuffer_tem); // places the ip  adn the uptime i write buffer 
-    ///------------uptime and ip wirte buffer genterated end;---- ///
+      ///------------uptime and ip wirte buffer genterated---- //
+      // ------ uptime ------------//
+      fp = popen("uptime","r" ); // run the commad
+      if(fp ==NULL){
+         perror("uptime commad failed to read");
+         exit(1);
+      }
+      char writebuffer_tem[buffersize]; 
+      fgets(writebuffer_tem,buffersize, fp);   // puts tiem uptime output to this value 
+      writebuffer_tem[strlen(writebuffer_tem)-1]='\0'; // places a null in the end incase there isn't
+      pclose(fp);
+      // ------ ip ------------//
+      fip = popen("hostname -I","r" ); // run the commad to get ipaddres of the this sever 
+      if(fip ==NULL){ 
+         perror("uptime commad failed to read");
+         exit(1);
+      }
+      char writebuffer_IP[buffersize]; // the ip address of the computer here 
+      fscanf(fip,"%s",writebuffer_IP); // gets first word of the ip addrss commad hostname -I"'s output
+      writebuffer_IP[strlen(writebuffer_IP)]='\0'; // put null in the end of the string 
+      pclose(fip);
+      sprintf(writebuffer,"%s: %s", writebuffer_IP ,writebuffer_tem); // places the ip  adn the uptime i write buffer 
+      ///------------uptime and ip wirte buffer genterated end;---- ///
 
-    if(write(newscoket,writebuffer,buffersize)<0){ // sents writebuffer amd if unsufesfull the sever closes 
-        closeSever(sever_scoket);
-       // printf("write_r: %d\n",-1);
-    }else{
-       // printf("write_r: %d\n",0);
-    }
-   // printf("write_r: %d sending: %s\n",buffersize,writebuffer);
+      if(write(newscoket,writebuffer,buffersize)<0){ // sents writebuffer amd if unsufesfull the sever closes 
+         closeSever(sever_scoket);
+         // printf("write_r: %d\n",-1);
+      }else{
+         // printf("write_r: %d\n",0);
+      }
+      // printf("write_r: %d sending: %s\n",buffersize,writebuffer);
 
-
+   }
 
     closeSever(sever_scoket); //  the sever closes 
     return 0;
