@@ -41,9 +41,13 @@ int main(int argc, char **argv)
      char readbuffer[buffersize];
     char writebuffer[buffersize];
     int numberofpackets; 
-    int numberofbytes;
-    int numberofbytesSend; 
-    int dropping = 0; 
+    int numberofbytes;  // number of bytes revived 
+    int numberofbytesSend;  // number of bytes this will send 
+
+    int dropping; 
+    int dropcount;
+    int dropinput=atoi(argv[5]); // the loss rate value is stored here
+
 
 
     sever_scoket = socket(PF_INET,SOCK_DGRAM,0); // udp comminucation socket
@@ -53,48 +57,68 @@ int main(int argc, char **argv)
     addr.sin_addr.s_addr =INADDR_ANY;
 
 
-    printf("scr: %s : %s\n", argv[1],argv[2]);
+    printf("scr: %s : %s\n", argv[1],argv[2]); // prints out vlc scourse ip address info
 
 
     dst_addr.sin_family =AF_INET;
-    dst_addr.sin_port = htons(1028); // dst the port 
-    dst_addr.sin_addr.s_addr =inet_addr("127.0.0.1"); // the distitation ip
+    dst_addr.sin_port = htons(atoi(argv[4])); // dst the port 
+    dst_addr.sin_addr.s_addr =inet_addr(argv[3]); // the distitation ip
 
-        printf("dst: %s : %s\n", argv[3],argv[4]);
+    printf("dst: %s : %s\n", argv[3],argv[4]); // prints out destination scourse ip address info
 
 
-    if( bind(sever_scoket,&addr,sizeof(addr)) < 0 ){
+
+    if( bind(sever_scoket,&addr,sizeof(addr)) < 0 ){ //  bind this sever/udpfowarder 
         close(sever_scoket);
         printf("bind: %d\n",-1);
     }else{
        printf("bind: %d\n",0);
     }
 
-numberofpackets = 0;
+numberofpackets = 0; // the number of packets 
+dropcount=0; // amount of packets droped
+
+dropping = (rand()%(1000/dropinput)) ; // it sotres a random number from 0 to 1000/lossrate. for exaple lost rate if 10 then it will store a random number bewtten 0 to 100 this will be used to determind which packet to drop
+/**
+ * *********IMPORTED NOTES***************
+ * I will reffer 0 to 1000/lossrate  as "range of loss"
+ */
     while(1){
 
         numberofbytes=0;
-        numberofbytes = recvfrom(sever_scoket,readbuffer,buffersize-1,0,(struct sockaddr*)&src_addr,&src_addr_len);
+        numberofbytes = recvfrom(sever_scoket,readbuffer,buffersize-1,0,(struct sockaddr*)&src_addr,&src_addr_len);// recives the packet 
+
         printf("got number of bytes: %d\n", numberofbytes);
         
 
-        if(numberofbytes== -1 ){
+        if(numberofbytes== -1 ){ // breaks while loop if reciving is not working well 
             break;
         }else{
-            //readbuffer[numberofbytes] ='\0';
-            numberofpackets++;
-            printf("numberofpackets: %d\n\n\n", numberofpackets);
+            printf("numberofpackets: %d\n", (numberofpackets)); // prints the total number of packts recived 
+                        numberofpackets++; // count the number of packet recivied 
+
         }
-      //  dropping =(rand()%1000)+1 atoi(argv[5]);
+
+// (1000/dropinput) is the maxium of the "range of loss "and moding numberofpackets with it  he maxium of the "range of loss" limts the range of numberofpackets to 0 to (1000/dropinput) 
+        if((numberofpackets%(1000/dropinput))==0){ // therefore this is basicly saying if numberofpackets%(1000/dropinput) go through all of the value from 0 to (1000/dropinput) and goes back to 0 agian the dropping restes  
+            dropping = (rand()%(1000/dropinput)) ; // rests the value pick to drop 
+        }
+  
+        printf("dropping: %d \ntotaldorop: %d\n\n", dropping ,dropcount); // next drop packt number and count of drops 
 
 
-        if(1){
+        if(dropping!= (numberofpackets%(1000/dropinput))  ){ // if dropping the packect number pick to drop is not equal to   numberofpackets in the rage of "rage of loss" then it will send the packet to destination address
             
-            numberofbytesSend = sendto(sever_scoket,readbuffer, numberofbytes ,0, (struct sockaddr*)&dst_addr, sizeof(dst_addr));
-            printf("senting: %d bytes\n\n", numberofbytesSend);
+            numberofbytesSend = sendto(sever_scoket,readbuffer, numberofbytes ,0, (struct sockaddr*)&dst_addr, sizeof(dst_addr)); // sends to destination adrress 
+
+            printf("senting: %d bytes\n\n", numberofbytesSend); // prin tto comform it sneded 
+
             if( numberofbytesSend < 0){
                 break;
             }
+        }else{ // it the dropps matches then it doesn't send 
+            
+            dropcount++; // cout of sroup goes up by one 
         }
         
     }
