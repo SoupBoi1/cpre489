@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 numberofpackets = 0; // the number of packets 
 dropcount=0; // amount of packets droped
 int tem_checker =0; // used for if statements weather to drop or send
-if(dropinput >0){
+if(dropinput >0){ // if lassrate =0 it will chose to drop -1 it no droping else it will pick the number
 
     dropping = (rand()%(1000/dropinput)) ; // it sotres a random number from 0 to 1000/lossrate. for exaple lost rate if 10 then it will store a random number bewtten 0 to 100 this will be used to determind which packet to drop
 }else{
@@ -104,7 +104,7 @@ if(dropinput >0){
                         numberofpackets++; // count the number of packet recivied 
 
         }
-        if(dropinput >0){
+        if(dropinput >0){ //  if the loss rate is 0 then temcheck thethat detersmines weather to drop is set to a value that make the just sents 
             printf("dropdays----\n");
            tem_checker = (numberofpackets%(1000/dropinput));
             // (1000/dropinput) is the maxium of the "range of loss "and moding numberofpackets with it  he maxium of the "range of loss" limts the range of numberofpackets to 0 to (1000/dropinput) 
@@ -114,7 +114,7 @@ if(dropinput >0){
         }else{
             printf("lossess----\n");
 
-            tem_checker = 0;
+            tem_checker = 0;// 0!=-1 hech it will sents 
             dropping = -1;
         }
 
