@@ -77,8 +77,14 @@ int main(int argc, char **argv)
 
 numberofpackets = 0; // the number of packets 
 dropcount=0; // amount of packets droped
+int tem_checker =0; // used for if statements weather to drop or send
+if(dropinput >0){
 
-dropping = (rand()%(1000/dropinput)) ; // it sotres a random number from 0 to 1000/lossrate. for exaple lost rate if 10 then it will store a random number bewtten 0 to 100 this will be used to determind which packet to drop
+    dropping = (rand()%(1000/dropinput)) ; // it sotres a random number from 0 to 1000/lossrate. for exaple lost rate if 10 then it will store a random number bewtten 0 to 100 this will be used to determind which packet to drop
+}else{
+    dropping=-1;
+}
+
 /**
  * *********IMPORTED NOTES***************
  * I will reffer 0 to 1000/lossrate  as "range of loss"
@@ -98,16 +104,25 @@ dropping = (rand()%(1000/dropinput)) ; // it sotres a random number from 0 to 10
                         numberofpackets++; // count the number of packet recivied 
 
         }
+        if(dropinput >0){
+            printf("dropdays----\n");
+           tem_checker = (numberofpackets%(1000/dropinput));
+            // (1000/dropinput) is the maxium of the "range of loss "and moding numberofpackets with it  he maxium of the "range of loss" limts the range of numberofpackets to 0 to (1000/dropinput) 
+            if((numberofpackets%(1000/dropinput))==0){ // therefore this is basicly saying if numberofpackets%(1000/dropinput) go through all of the value from 0 to (1000/dropinput) and goes back to 0 agian the dropping restes  
+                dropping = (rand()%(1000/dropinput)) ; // rests the value pick to drop 
+            }
+        }else{
+            printf("lossess----\n");
 
-// (1000/dropinput) is the maxium of the "range of loss "and moding numberofpackets with it  he maxium of the "range of loss" limts the range of numberofpackets to 0 to (1000/dropinput) 
-        if((numberofpackets%(1000/dropinput))==0){ // therefore this is basicly saying if numberofpackets%(1000/dropinput) go through all of the value from 0 to (1000/dropinput) and goes back to 0 agian the dropping restes  
-            dropping = (rand()%(1000/dropinput)) ; // rests the value pick to drop 
+            tem_checker = 0;
+            dropping = -1;
         }
-  
+
+
         printf("dropping: %d \ntotaldorop: %d\n\n", dropping ,dropcount); // next drop packt number and count of drops 
 
 
-        if(dropping!= (numberofpackets%(1000/dropinput))  ){ // if dropping the packect number pick to drop is not equal to   numberofpackets in the rage of "rage of loss" then it will send the packet to destination address
+        if(dropping!=tem_checker ){ // if dropping the packect number pick to drop is not equal to   numberofpackets in the rage of "rage of loss" then it will send the packet to destination address
             
             numberofbytesSend = sendto(sever_scoket,readbuffer, numberofbytes ,0, (struct sockaddr*)&dst_addr, sizeof(dst_addr)); // sends to destination adrress 
 
