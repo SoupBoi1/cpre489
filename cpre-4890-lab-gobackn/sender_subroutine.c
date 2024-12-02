@@ -25,7 +25,9 @@ void primary(int sockfd, double ber) {
     packet_t packetArray[number_of_packets];
     char srv_reply[150];
 
-    int tem_number_of_reply; 
+    int tem_number_of_reply=0; 
+    int tem_buffer_window=0; 
+
 
     char temPacketdata[2]; // place holder to create ther data for ecah packet 
     for (int i =0; i < number_of_packets;i++){
@@ -42,6 +44,7 @@ void primary(int sockfd, double ber) {
 
     printf("---------Beginning subroutine---------\n");
     
+
     while (buffer_window < number_of_packets){ // does 
         printf("\n\nBUFFER INDEX=: %d \nPorgrss:%d/%d\n ",buffer_window,number_of_packets-buffer_window ,number_of_packets);
 
@@ -54,8 +57,9 @@ void primary(int sockfd, double ber) {
                 print_packet(&packetArray[buffer_window +i]);
             }
         }
+        tem_buffer_window =buffer_window; //used to hold the buffer_window value before being updtae in reciving ack and nack
         for(int i =0; i< window;i++){ 
-            if (buffer_window+i< number_of_packets){ 
+            if (tem_buffer_window+i< number_of_packets){ 
                 if ((read_size = recv(sockfd, srv_reply, PKT_SIZE, 0)) < 0) { // reciveinng the packect look for the three packects 
                     perror("recv failed");
                 } else {
