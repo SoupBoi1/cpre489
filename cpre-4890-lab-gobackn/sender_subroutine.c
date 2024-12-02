@@ -42,37 +42,43 @@ void primary(int sockfd, double ber) {
 
     printf("---------Beginning subroutine---------\n");
     
-    while (buffer_window < number_of_packets){
-        for(int i =0; i< window;i++){
-            if (buffer_window+i< number_of_packets){
-                if (send(sockfd, &packetArray[buffer_window +i], sizeof(packetArray[buffer_window +i]), 0) < 0)
+    while (buffer_window < number_of_packets){ // does 
+        printf("\n\nBUFFER INDEX=: %d \nPorgrss:%d/%d\n ",buffer_window,number_of_packets-buffer_window ,number_of_packets);
+
+        for(int i =0; i< window;i++){// send the packets in the window 
+            if (buffer_window+i< number_of_packets){ // checks if the buffer window isn't over the limt of the array
+                if (send(sockfd, &packetArray[buffer_window +i], sizeof(packetArray[buffer_window +i]), 0) < 0) //sendstyhe packet
                     perror("Send failed");
 
                 printf("Sent packet: ");
                 print_packet(&packetArray[buffer_window +i]);
             }
         }
-        for(int i =0; i< window;i++){
-            if ((read_size = recv(sockfd, srv_reply, PKT_SIZE, 0)) < 0) {
-                perror("recv failed");
-            } else {
-                printf("\n%d\n",i);
-                printf("Received packet: ");
-                print_packet((packet_t *)&srv_reply);
-                tem_number_of_reply = sizeof((packet_t *)&srv_reply)/sizeof((packet_t *)&srv_reply)[0];
-                for (int y =0; y< tem_number_of_reply;y++){
-                    if( ((packet_t *)srv_reply)[y].type == PKT_TYPE_ACK ){
-                        if (buffer_window == (((packet_t *)srv_reply)[y].sequence_number)-1 ){
-                            printf("working %d == %d -1\n",buffer_window,(((packet_t *)srv_reply)[y].sequence_number));
-                            buffer_window+=1; // adjectig the window size
-                        }else{
-                            printf("not working %d != %d -1\n",buffer_window,(((packet_t *)srv_reply)[y].sequence_number));
+        for(int i =0; i< window;i++){ 
+            if (buffer_window+i< number_of_packets){ 
+                if ((read_size = recv(sockfd, srv_reply, PKT_SIZE, 0)) < 0) { // reciveinng the packect look for the three packects 
+                    perror("recv failed");
+                } else {
+                    printf("\n%d\n",i);
+                    printf("Received packet: ");
+                    print_packet((packet_t *)&srv_reply); //prints the packet recived
+                    tem_number_of_reply = sizeof((packet_t *)&srv_reply)/sizeof((packet_t *)&srv_reply)[0]; // size of the arrqy of the number of packets recived at that movement
+                    
+                    for (int y =0; y< tem_number_of_reply;y++){ // goes through all the packect recived
+
+                        if( ((packet_t *)srv_reply)[y].type == PKT_TYPE_ACK ){ // checks if it's a ack type apck
+                            if (buffer_window == (((packet_t *)srv_reply)[y].sequence_number)-1 ){ // if its the correct sequence number 
+                                printf("working %d+1 == %d\n",buffer_window,(((packet_t *)srv_reply)[y].sequence_number));
+                                buffer_window+=1; // adjectig the window size
+                            }else{
+                                printf("not working %d != %d -1\n",buffer_window,(((packet_t *)srv_reply)[y].sequence_number));
+
+                            }
 
                         }
-
                     }
+                    
                 }
-                
             }
         }
 
