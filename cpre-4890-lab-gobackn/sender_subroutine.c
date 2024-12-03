@@ -42,6 +42,13 @@ void primary(int sockfd, double ber) {
     }
     
     printf("---------Beginning subroutine---------\n");
+int ACKcount=0;
+int ACKcount_ig=0;
+int ACKcount_w=0;
+
+int NACKcount=0;
+int number_of_sends=0;
+
 
     while (buffer_window < number_of_packets ){ // does 
 
@@ -56,12 +63,13 @@ void primary(int sockfd, double ber) {
 
                 printf("Sent packet: ");
                 print_packet(&packetArray[buffer_window +i]); // prints the packet send
+                number_of_sends+=1;
 
             }
         }
 
         tem_send_window =buffer_window; //used to hold the buffer_window value before being updtae in reciving ack and nack
-        for(int i =0; i< window;i++){  // recives all the packect sent
+        for(int i =0; i< window;i++){  // recivtes all the packect sent
             if (tem_send_window+i< number_of_packets){  // // checks if the buffer window isn't over the limt of the array
                 if ((read_size = recv(sockfd, srv_reply, PKT_SIZE, 0)) < 0) { // reciveinng the packect look for the three packects 
                     perror("recv failed");
@@ -73,14 +81,15 @@ void primary(int sockfd, double ber) {
                     for (int y =0; y< tem_number_of_reply;y++){ // goes through all the packect recived
 
                         if( ((packet_t *)srv_reply)[y].type == PKT_TYPE_ACK ){ // checks if it's a ack type apck
+                          ACKcount+=1;
                             printf("\tGOT ACK: looking for %d\n",buffer_window+1); // print to indicate it's an ACK
                             if (buffer_window == (((packet_t *)srv_reply)[y].sequence_number)-1 ){ // if its the correct sequence number 
                                 buffer_window+=1; // adjectig the window size
                                 printf("\tgot %d, update window size to %d \n",(((packet_t *)srv_reply)[y].sequence_number),buffer_window); // print ditails
-
+                                ACKcount_w +=1;
                             }else{
                                 printf("\tgot %d IGNORE\n",(((packet_t *)srv_reply)[y].sequence_number)); // prints if duplicate and some other reaso for not working 
-
+                                ACKcount_ig +=1;
                             }
 
                         }
@@ -88,6 +97,8 @@ void primary(int sockfd, double ber) {
                         if( ((packet_t *)srv_reply)[y].type == PKT_TYPE_NAK ){ // checks if it's a Nack 
                             printf("\tGOT NACK: current sendwindow %d go to %d \n",buffer_window,((packet_t *)srv_reply)[y].sequence_number -window); // print to indicate it's an ACK
                             buffer_window = ((packet_t *)srv_reply)[y].sequence_number ; // set the window size to apropiact index to send the NACK
+                            NACKcount +=1;
+                            //i=window;
                         }
                     }
 
@@ -95,9 +106,18 @@ void primary(int sockfd, double ber) {
                 }
             }
         }
+        
 
 
 
     }
+
+    printf("\n# of ACK: %d\n",ACKcount);
+    printf("# of ACK taken: %d\n",ACKcount_w);
+    printf("# of ACK ignored: %d\n",ACKcount_ig);
+    printf("# of NACK: %d\n",NACKcount);
+    printf("# of sends: %d\n",number_of_sends);
+
+
 
 }
